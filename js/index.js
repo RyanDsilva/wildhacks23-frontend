@@ -1,6 +1,16 @@
 let video;
 let poseNet;
 let poses = [];
+let groundTruth = [];
+let poseIndex = 0;
+
+function changePose() {
+  if (poseIndex == 3) {
+    poseIndex = 0;
+  } else {
+    poseIndex += 1;
+  }
+}
 
 const line_bones_dict = [
   { p1: 7, p2: 9, name: "right-forearm" },
@@ -17,8 +27,6 @@ const line_bones_dict = [
   { p1: 12, p2: 11, name: "hip" },
 ];
 
-const list_points1 = groundTruth[0]["pose"]["keypoints"];
-
 function modelReady() {
   console.log("Model Loaded!");
 }
@@ -28,6 +36,15 @@ function setup() {
   canvas.parent("canvasP5");
   video = createCapture(VIDEO);
   video.size(width, height);
+
+  $.ajax({
+    type: "GET",
+    url: "http://127.0.0.1:5000/api/v1/sequence",
+    success: function (data) {
+      console.log(data);
+      groundTruth = data;
+    },
+  });
 
   // Create a new poseNet method with a single detection
   poseNet = ml5.poseNet(
@@ -63,9 +80,11 @@ function draw() {
 
   drawKeypoints();
   //   drawSkeletonOld();
-  drawSkeleton();
-  drawKeypointsForGroundTruth();
-  drawSkeletonGroundTruth();
+  if (groundTruth.length > 0) {
+    drawSkeleton();
+    drawKeypointsForGroundTruth();
+    drawSkeletonGroundTruth();
+  }
 }
 
 // A function to draw ellipses over the detected keypoints
@@ -128,7 +147,7 @@ function createMeraVector(A) {
   return bulletVector;
 }
 function dotproduct(v1, v2) {
-  console.log(v1, v2);
+  // console.log(v1, v2);
   var result = v1[0] * v2[0] + v1[1] * v2[1];
   //   console.log("dotproduct", result);
   return result;
@@ -147,7 +166,9 @@ function cosineSim(A, B) {
 // A function to draw the skeletons with similarity metric
 function drawSkeleton() {
   strokeWeight(5);
+  const list_points1 = groundTruth[poseIndex]["value"]["pose"]["keypoints"];
   for (let k = 0; k < poses.length; k += 1) {
+    let correctPoints = 0;
     for (let i = 0; i < line_bones_dict.length; i++) {
       lineO = line_bones_dict[i];
       bodypart = line_bones_dict[i]["name"];
@@ -196,37 +217,46 @@ function drawSkeleton() {
             poses[k]["pose"]["keypoints"][lineO.p2]["position"].x / 2,
             poses[k]["pose"]["keypoints"][lineO.p2]["position"].y
           );
+          correctPoints += 1;
         }
       }
+    }
+    if (correctPoints == line_bones_dict.length) {
+      changePose();
     }
   }
 }
 
 function drawKeypointsForGroundTruth() {
   //   for (let i = 0; i < groundTruth.length; i += 1) {
-  const pose = groundTruth[0].pose;
+  const pose = groundTruth[poseIndex]["value"].pose;
   for (let j = 0; j < pose.keypoints.length; j += 1) {
     const keypoint = pose.keypoints[j];
     if (keypoint.score > 0.2) {
       fill(0, 0, 255);
       noStroke();
-      ellipse(width / 4 + keypoint.position.x, keypoint.position.y, 10, 10);
+      ellipse(
+        width / 2 + keypoint.position.x,
+        height / 4 + keypoint.position.y,
+        10,
+        10
+      );
     }
   }
 }
 
 function drawSkeletonGroundTruth() {
   // for (let i = 0; i < poses.length; i += 1) {
-  const skeleton = groundTruth[0].skeleton;
+  const skeleton = groundTruth[poseIndex]["value"].skeleton;
   for (let j = 0; j < skeleton.length; j += 1) {
     const partA = skeleton[j][0];
     const partB = skeleton[j][1];
     stroke(255, 255, 255);
     line(
-      width / 4 + partA.position.x,
-      partA.position.y,
-      width / 4 + partB.position.x,
-      partB.position.y
+      width / 2 + partA.position.x,
+      height / 4 + partA.position.y,
+      width / 2 + partB.position.x,
+      height / 4 + partB.position.y
     );
   }
   // }

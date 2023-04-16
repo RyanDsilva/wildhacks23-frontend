@@ -43,6 +43,16 @@ function imageReady() {
   // This sets up an event that listens to 'pose' events
   poseNet.on("pose", function (results) {
     poses = results;
+    console.log(results[0]);
+    $.ajax({
+      type: "POST",
+      url: "http://127.0.0.1:5000/api/v1/sequence",
+      data: { key: "test", value: JSON.stringify(results[0]) },
+      dataType: "application/json",
+      success: function (_) {
+        alert("success");
+      },
+    });
   });
 }
 
