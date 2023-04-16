@@ -26,15 +26,17 @@ function handleFile(file) {
 function imageReady() {
   // set some options
   let options = {
-    // architecture: "ResNet50",
-    // outputStride: 16,
-    // flipHorizontal: false,
-    minConfidence: 0.3,
-    // scoreThreshold: 0.5,
-    // nmsRadius: 20,
-    // detectionType: "single",
-    // inputResolution: 503,
-    // multiplier: 0.75,
+    architecture: "ResNet50",
+    imageScaleFactor: 0.5,
+    outputStride: 16,
+    flipHorizontal: true,
+    minConfidence: 0.15,
+    maxPoseDetections: 5,
+    scoreThreshold: 0.15,
+    nmsRadius: 20,
+    detectionType: "single",
+    inputResolution: 801,
+    multiplier: 1.01,
     quantBytes: 4,
   };
 
@@ -46,7 +48,7 @@ function imageReady() {
     console.log(results[0]);
     $.ajax({
       type: "POST",
-      url: "http://127.0.0.1:5000/api/v1/sequence",
+      url: "https://wildhacks23.herokuapp.com/api/v1/sequence",
       data: { key: "test", value: JSON.stringify(results[0]) },
       dataType: "application/json",
       success: function (_) {

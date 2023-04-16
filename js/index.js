@@ -3,6 +3,7 @@ let poseNet;
 let poses = [];
 let groundTruth = [];
 let poseIndex = 0;
+let m = 2;
 
 function changePose() {
   if (poseIndex == 3) {
@@ -32,14 +33,14 @@ function modelReady() {
 }
 
 function setup() {
-  let canvas = createCanvas(640, 580);
+  let canvas = createCanvas(1280, 640);
   canvas.parent("canvasP5");
   video = createCapture(VIDEO);
   video.size(width, height);
 
   $.ajax({
     type: "GET",
-    url: "http://127.0.0.1:5000/api/v1/sequence",
+    url: "https://wildhacks23.herokuapp.com/api/v1/sequence",
     success: function (data) {
       console.log(data);
       groundTruth = data;
@@ -52,14 +53,16 @@ function setup() {
     "single",
     {
       architecture: "ResNet50",
+      imageScaleFactor: 0.5,
       outputStride: 16,
-      flipHorizontal: false,
-      minConfidence: 0.3,
-      scoreThreshold: 0.3,
+      flipHorizontal: true,
+      minConfidence: 0.15,
+      maxPoseDetections: 5,
+      scoreThreshold: 0.15,
       nmsRadius: 20,
       detectionType: "single",
       inputResolution: 801,
-      multiplier: 0.75,
+      multiplier: 1.01,
       quantBytes: 4,
     },
     modelReady
@@ -76,14 +79,17 @@ function setup() {
 
 function draw() {
   background(0);
+  translate(width / 2, 0);
+  scale(-1, 1);
   image(video, 0, 0, width / 2, height);
-
   drawKeypoints();
   //   drawSkeletonOld();
   if (groundTruth.length > 0) {
     drawSkeleton();
-    drawKeypointsForGroundTruth();
+    translate(width / 2, 0);
+    scale(-1, 1);
     drawSkeletonGroundTruth();
+    drawKeypointsForGroundTruth();
   }
 }
 
@@ -94,7 +100,7 @@ function drawKeypoints() {
   for (let i = 0; i < poses.length; i += 1) {
     // For each pose detected, loop through all the keypoints
     const pose = poses[i].pose;
-    for (let j = 0; j < pose.keypoints.length; j += 1) {
+    for (let j = 5; j < pose.keypoints.length; j += 1) {
       // A keypoint is an object describing a body part (like rightArm or leftShoulder)
       const keypoint = pose.keypoints[j];
       // Only draw an ellipse is the pose probability is bigger than 0.2
@@ -119,25 +125,25 @@ function drawKeypoints() {
 }
 
 // A function to draw the skeletons
-function drawSkeletonOld() {
-  // Loop through all the skeletons detected
-  for (let i = 0; i < poses.length; i += 1) {
-    const skeleton = poses[i].skeleton;
-    // For every skeleton, loop through all body connections
-    for (let j = 0; j < skeleton.length; j += 1) {
-      const partA = skeleton[j][0];
-      const partB = skeleton[j][1];
-      stroke(255, 0, 0);
-      strokeWeight(5);
-      line(
-        partA.position.x / 2,
-        partA.position.y,
-        partB.position.x / 2,
-        partB.position.y
-      );
-    }
-  }
-}
+// function drawSkeletonOld() {
+//   // Loop through all the skeletons detected
+//   for (let i = 0; i < poses.length; i += 1) {
+//     const skeleton = poses[i].skeleton;
+//     // For every skeleton, loop through all body connections
+//     for (let j = 0; j < skeleton.length; j += 1) {
+//       const partA = skeleton[j][0];
+//       const partB = skeleton[j][1];
+//       stroke(255, 0, 0);
+//       strokeWeight(5);
+//       line(
+//         partA.position.x / 2.5,
+//         partA.position.y,
+//         partB.position.x / 2.5,
+//         partB.position.y
+//       );
+//     }
+//   }
+// }
 
 function createMeraVector(A) {
   const distance = [A[0] - A[2], A[1] - A[3]];
@@ -197,10 +203,10 @@ function drawSkeleton() {
       //   console.log(degree_angle);
       //   let cosineSimilarity = Math.abs(Math.cos(degree_angle));
       if (
-        poses[k]["pose"]["keypoints"][lineO.p1]["score"] > 0.9 &&
-        poses[k]["pose"]["keypoints"][lineO.p2]["score"] > 0.9
+        poses[k]["pose"]["keypoints"][lineO.p1]["score"] > 0.5 &&
+        poses[k]["pose"]["keypoints"][lineO.p2]["score"] > 0.5
       ) {
-        if (cosineSimilarity < 0.5) {
+        if (Math.abs(cosineSimilarity) < 0.7) {
           stroke(255, 0, 0);
           line(
             poses[k]["pose"]["keypoints"][lineO.p1]["position"].x / 2,
@@ -222,7 +228,9 @@ function drawSkeleton() {
       }
     }
     if (correctPoints == line_bones_dict.length) {
-      changePose();
+      swal("Good job!", "You got the pose!", "success").then((_) => {
+        changePose();
+      });
     }
   }
 }
@@ -232,12 +240,12 @@ function drawKeypointsForGroundTruth() {
   const pose = groundTruth[poseIndex]["value"].pose;
   for (let j = 0; j < pose.keypoints.length; j += 1) {
     const keypoint = pose.keypoints[j];
-    if (keypoint.score > 0.2) {
-      fill(0, 0, 255);
+    if (keypoint.score > 0.15) {
+      fill(255, 255, 255);
       noStroke();
       ellipse(
-        width / 2 + keypoint.position.x,
-        height / 4 + keypoint.position.y,
+        width / 2 + keypoint.position.x * m,
+        height / 16 + keypoint.position.y * m,
         10,
         10
       );
@@ -251,12 +259,12 @@ function drawSkeletonGroundTruth() {
   for (let j = 0; j < skeleton.length; j += 1) {
     const partA = skeleton[j][0];
     const partB = skeleton[j][1];
-    stroke(255, 255, 255);
+    stroke(0, 255, 0);
     line(
-      width / 2 + partA.position.x,
-      height / 4 + partA.position.y,
-      width / 2 + partB.position.x,
-      height / 4 + partB.position.y
+      width / 2 + partA.position.x * m,
+      height / 16 + partA.position.y * m,
+      width / 2 + partB.position.x * m,
+      height / 16 + partB.position.y * m
     );
   }
   // }
