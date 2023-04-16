@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoveMentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+  </head>
+  <body class="bg-yellow-50">
+    <div class="flex relative w-full">
+      <nav class="fixed z-10 w-full bg-white md:absolute md:bg-transparent">
+        <div class="container m-auto px-2 md:px-12 lg:px-7">
+          <div
+            class="flex flex-wrap items-center justify-between py-3 gap-6 md:py-4 md:gap-0"
+          >
+            <div class="w-full px-6 flex justify-between lg:w-max md:px-0">
+              <a
+                href="index.html"
+                aria-label="logo"
+                class="flex space-x-2 items-center"
+              >
+                <span class="text-2xl font-bold text-yellow-900"
+                  >Move <span class="text-yellow-700">Mentor</span></span
+                >
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <p
+      class="flex items-center justify-center mt-16 text-orange-300 font-bold"
+      id="keypoints"
+    ></p>
+    <div class="flex items-center justify-center mt-2">
+      <div class="block" id="canvasP5"></div>
+    </div>
+    <div class="text-center">
+      <a
+        type="button"
+        href="upload.html"
+        title="Start buying"
+        class="mt-8 ml-auto py-3 px-6 rounded-full text-center transition bg-gradient-to-b from-yellow-200 to-yellow-300 hover:to-red-300 active:from-yellow-400 focus:from-red-400 md:px-12"
+      >
+        <span class="hidden text-yellow-900 font-semibold md:block">
+          Upload Sequence To Learn
+        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-5 mx-auto text-yellow-900 md:hidden"
+          fill="currentColor"
+          class="bi bi-search"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"
+          />
+        </svg>
+      </a>
+    </div>
+    <footer class="mt-14 footer footer-center w-full p-4 bg-yellow-50 text-gray-800">
+      <div class="text-center">
+        <p>
+          Copyright © 2023 -
+          <a class="font-semibold" href="mailto:dsilvar@purdue.edu">ByteMe</a>
+        </p>
+      </div>
+    </footer>
+    <script src="js/groundTruth.js"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

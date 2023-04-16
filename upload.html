@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoveMentor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body class="bg-yellow-50">
+    <nav class="fixed z-10 w-full bg-white md:absolute md:bg-transparent">
+      <div class="container m-auto px-2 md:px-12 lg:px-7">
+        <div
+          class="flex flex-wrap items-center justify-between py-3 gap-6 md:py-4 md:gap-0"
+        >
+          <div class="w-full px-6 flex justify-between lg:w-max md:px-0">
+            <a
+              href="index.html"
+              aria-label="logo"
+              class="flex space-x-2 items-center"
+            >
+              <span class="text-2xl font-bold text-yellow-900"
+                >Move <span class="text-yellow-700">Mentor</span></span
+              >
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <br />
+    <div class="mt-32">
+      <div class="flex items-center justify-center">
+        <form>
+          <div class="input_container">
+            <div id="upload"></div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="js/upload.js"></script>
+  </body>
+</html>
